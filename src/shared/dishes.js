@@ -86,7 +86,7 @@ export const DISHES =
             id: 4,
             rating: 2,
             comment: "It's your birthday, we're gonna party!",
-            author: "25 Cent",
+            author: "26 Cent",
             date: "2011-12-02T17:57:28.556094Z"
             }
         ]
@@ -132,7 +132,7 @@ export const DISHES =
             id: 4,
             rating: 2,
             comment: "It's your birthday, we're gonna party!",
-            author: "25 Cent",
+            author: "27 Cent",
             date: "2011-12-02T17:57:28.556094Z"
             }
         ]
@@ -178,7 +178,7 @@ export const DISHES =
             id: 4,
             rating: 2,
             comment: "It's your birthday, we're gonna party!",
-            author: "25 Cent",
+            author: "28 Cent",
             date: "2011-12-02T17:57:28.556094Z"
             }
         ]
