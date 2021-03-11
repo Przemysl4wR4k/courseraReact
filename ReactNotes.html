@@ -219,3 +219,154 @@ this.state = {
 
 dzięki umieszczeniu tego w "state" możemy się do tego odwołać w innych 
 funkcjach
+
+stworzenie wyglądu pozycji w menu:
+
+const menu = this.state.dishes.map((dish) => {
+  return (
+      <div key={dish.id} className="col-12 mt-5">
+          <Media tag="li">
+              <Media left middle>
+                  <Media object src={dish.image} alt={dish.name} />
+              </Media>
+              <Media body className="ml-5">
+                  <Media heading>{dish.name}</Media>
+                  <p>{dish.description}</p>
+              </Media>
+          </Media>
+      </div>
+  );
+});
+
+/* mapowanie interuje po wszystkich dishesh, przypisujemy kazdej pozycji
+klucz, tak bym móc się bez problemu do nich odwoływać */
+
+żeby użyc stworzonego komponentu wystarczy teraz dodać jego tag do App.js
+
+<Menu/>
+
+a wczesniej zaimporotwac go 
+
+import Menu from './components/MenuComponent';
+
+oprócz tego wyczyszczony został plik App.css, a z diva w App.js zabrana
+zostało className="App"
+
+
+States & Props:
+
+state jest prywatny, może zostać przekazany przy dziedziczeniu do dzieci
+za pomocą propsów.
+state może być używany tylko przez class component i znajuje sie najczesciej
+w konstruktorze
+
+do zmiany stanu uzywana jest funkcja setState()
+NIE WOLNO tego robic za pomoca =
+np this.state.smth = val1;
+
+do współdzielenia informacji poomiędzy komponentami w aplikacji 
+utworzony zosaje folder "shared" wewnątrz folderu "src"
+a w srodku utworzymy pierwszy plik "dishes.js" i wrzucamy do niego dane
+
+export const DISHES =
+    [
+        {
+        id: 0,
+        name:'Uthappizza',
+    .
+    .
+    .
+    ]
+
+
+dane z pliku przekazujemy do App.js za pomocą 
+
+import { DISHES } from './shared/dishes';
+
+
+constructor(props) {
+  super(props);
+
+  this.state = {
+    dishes: DISHES
+  };
+}
+
+a do Menu przekazujemy za pomocą:
+
+<Menu dishes={this.state.dishes} />
+
+czyscimy state w MenuComponent.js
+
+a w renderowaniu wystarczy zmienic ze state na props
+
+const menu = this.props.dishes.map((dish) => {
+
+do ulepszenia layoutu użyjemy Card, w MenuComponent.js z Media zmieniamy na
+
+import { Card, CardImg, CardImgOverlay, CardBody, CardTitle } from 'reactstrap';
+
+używamy importów:
+
+const menu = this.props.dishes.map((dish) => {
+  return (
+      <div key={dish.id} className="col-12 col-md-5 m-1">
+          <Card onClick={() => this.onDishSelect(dish)}>
+              <CardImg width="100%" src={dish.image} alt={dish.name} />
+              <CardImgOverlay>
+                  <CardTitle heading>{dish.name}</CardTitle>
+              </CardImgOverlay>
+          </Card>
+      </div>
+  );
+});
+
+bedziemy chcieli wyswietlic info o nacisnietej pozycji menu na dole strony,
+do tego potrzeba:
+
+-umiejscowionego powyżej handlera (onClick)
+-aktualnie wybranej pozycji (domyslnie null)
+
+this.state = {
+  selectedDish: null
+};
+
+-funkcji zmieniajace state:
+
+onDishSelect(dish) {
+  this.setState({ selectedDish: dish});
+}
+
+- funkcji opisującej wyglad infomracji
+
+renderDish(dish) {
+  if (dish != null) {
+      return(
+          <Card>
+              <CardImg top src={dish.image} alt={dish.name} />
+              <CardBody>
+                  <CardTitle>{dish.name}</CardTitle>
+                  <CardText>{dish.description}</CardText>
+              </CardBody>
+          </Card>
+      );
+  }
+  else{
+      return(
+          <div></div>
+      );
+  }
+}
+
+- wyrenderowania:
+
+return (
+  <div className="container">
+      <div className="row">
+              {menu}
+      </div>
+      <div className="row">
+          {this.renderDish(this.state.selectedDish)}
+      </div>
+  </div>
+); 
