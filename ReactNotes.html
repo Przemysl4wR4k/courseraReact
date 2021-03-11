@@ -1,0 +1,221 @@
+Yarn:
+
+package manager, alternatwywa dla npm
+
+instalacja, w konsoli:
+
+npm install -g yarn
+
+w projekcie:
+
+yarn set version berry
+
+React:
+
+instalacja
+
+npm install -g create-react-app@1.5.2
+
+tworzenie apki:
+
+create-react-app --help     //instrukcja
+
+w folderze z projektem
+
+mkdir React
+
+cd React
+
+create-react-app confusion --scripts-version=react-scripts@1.1.4
+//confusion lub inna nazwa
+
+/*
+prawdopodobnie mona zakonczyc komende na confusion, ale wtedy w package.json
+należy dodać:
+
+"scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+*/
+
+następnie:
+
+cd confusion //w tym przypadku
+
+npm start
+
+lub
+
+yarn start
+
+strona startowa reacta bedzie dostepna na localhoscie
+
+stworzenie gita
+
+strona:
+
+jej kod znajduje się głównie w app.js
+
+
+klasy czesto implementuja komponenty
+
+funkcja render() służy do wyświetlania elementów
+
+w porownaniu o html nie uzywa sie tu "class=" tylko "className="
+
+pod koniec App.js "App" jest eksportowany:
+
+export default App;
+
+a w index.js importowany
+
+import App from "./App";
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+powyższa linia kodu renderuje App i podpina go do elementu z pliku 
+index.html o id="root"
+
+Konfiguracja Apki:
+
+dodanie do apki bootstrapu (reacstrapu)
+
+reactstrap to to samo tylko przeniesione i umozliwiajace prace z reactem
+
+cmd:
+
+yarn add bootstrap@4.0.0
+npm install bootstrap@4.0.0
+
+yarn add reactstrap@5.0.0 react-popper@0.9.2
+npm install reactstrap@5.0.0 react-popper@0.9.2 --save
+
+w index.js nad importowaniem index.css:
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+tak, że:
+
+import ReactDOM from 'react-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
+
+z App.js wyrzucamy domyślną zawartośc strony i wrzucamy to co chcemy,
+pamiętając o importowaniu tego z reactstrapa, jeszcze przed App.css,
+tak, że:
+
+import React, { Component } from 'react';
+import logo from './logo.svg';
+import { Navbar, NavbarBrand } from 'reactstrap'
+import './App.css';
+
+class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        <Navbar dark color="primary">
+          <div className="container">
+            <NavbarBrand href="/">Ristorante con Fusion</NavbarBrand>
+          </div>
+        </Navbar>
+      </div>
+    );
+  }
+}
+
+export default App;
+
+
+komponenty:
+
+w folderze src utworz folder components
+
+minimalna struktura komponentu:
+
+import React, { Component } from 'react';
+
+class Menu extends Component {
+    
+    constructor(props) {
+        super(props);
+    }
+
+    render(){
+       return (
+
+       ); 
+    }
+}
+
+export default Menu;
+
+funkcja render ma zwrócić menu w formie listy dań:
+
+render(){
+
+  const menu;
+
+  return (
+      <div className="container">
+          <div className="row">
+              <Media list>
+                  {menu}
+              </Media>
+          </div>
+      </div>
+  ); 
+}
+
+Media musi zostać zaimportowane
+
+import { Media } from 'reactstrap';
+
+w konstruktorze wpisujemy dane z których będziemy korzystać:
+
+this.state = {
+  dishes: [
+      {
+          id: 0,
+          name:'Uthappizza',
+          image: 'assets/images/uthappizza.png',
+          category: 'mains',
+          label:'Hot',
+          price:'4.99',
+          description:'A unique combination of Indian Uthappam (pancake) and Italian pizza, topped with Cerignola olives, ripe vine cherry tomatoes, Vidalia onion, Guntur chillies and Buffalo Paneer.'
+      },
+      {
+          id: 1,
+          name:'Zucchipakoda',
+          image: 'assets/images/zucchipakoda.png',
+          category: 'appetizer',
+          label:'',
+          price:'1.99',
+          description:'Deep fried Zucchini coated with mildly spiced Chickpea flour batter accompanied with a sweet-tangy tamarind sauce'
+      },
+      {
+          id: 2,
+          name:'Vadonut',
+          image: 'assets/images/vadonut.png',
+          category: 'appetizer',
+          label:'New',
+          price:'1.99',
+          description:'A quintessential ConFusion experience, is it a vada or is it a donut?'
+      },
+      {
+          id: 3,
+          name:'ElaiCheese Cake',
+          image: 'assets/images/elaicheesecake.png',
+          category: 'dessert',
+          label:'',
+          price:'2.99',
+          description:'A delectable, semi-sweet New York Style Cheese Cake, with Graham cracker crust and spiced with Indian cardamoms'
+      }
+  ],
+  
+};
+
+dzięki umieszczeniu tego w "state" możemy się do tego odwołać w innych 
+funkcjach
