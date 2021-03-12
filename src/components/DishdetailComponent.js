@@ -1,15 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {Card, CardBody, CardImg, CardText, CardImgOverlay, CardTitle} from 'reactstrap';
 
-class DishDetail extends Component{
-    constructor (props){
-        super(props);
-    }
-
-    renderDish(dish){
+    function RenderDish({dish}){
         return(
             <Card>
-                <CardImg width="100%" src={dish.image} alt={this.props.selectedDish.name} />
+                <CardImg width="100%" src={dish.image} alt={dish.name} />
                 <CardBody>
                     <CardTitle heading>{dish.name}</CardTitle>
                     <CardText>{dish.description}</CardText>
@@ -18,7 +13,7 @@ class DishDetail extends Component{
         )
     }
 
-    renderComments(comments){
+    function RenderComments({comments}){
 
         if(comments != null){
 
@@ -27,7 +22,7 @@ class DishDetail extends Component{
                     <li key={comment.id}>   
                         <div>
                             <p>{comment.comment}</p>
-                            <p>-- {comment.author}, {comment.date}</p>
+                            <p>-- {comment.author}, {new Intl.DateTimeFormat('en-US',{year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}</p>
                         </div>
                     </li>
                 );
@@ -50,18 +45,19 @@ class DishDetail extends Component{
 
     }
 
-    render(){
+    const DishDetail = (props) => {
 
-        if(this.props.selectedDish != null){
+        if(props.dish != null){
             return(
+                <div className="container">
                 <div className="row">
                     <div className="col-12 col-md-5 m-1">
-                        {this.renderDish(this.props.selectedDish)}
+                        <RenderDish dish={props.dish} />
                     </div>
                     <div className="col-12 col-md-5 m-1">
-                        {console.log(this.props.selectedDish.comments)}
-                        {this.renderComments(this.props.selectedDish.comments)}
+                        <RenderComments comments={props.dish.comments} />
                     </div>
+                </div>
                 </div>
             ) 
         }
@@ -72,7 +68,6 @@ class DishDetail extends Component{
         }
 
     }
-}
 
 
 export default DishDetail
