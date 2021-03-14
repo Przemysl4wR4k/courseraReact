@@ -606,3 +606,149 @@ function Footer(props) {
 }
 
 export default Footer;
+
+trzeba zarowno naglowek jak i stopke zaimplementowac w MainComponent.js
+
+do App.css mozna dodac style
+
+Router:
+
+umozliwia nawigacje pomiedzy widokami 
+
+yarn add react-router-dom@4.2.2
+npm install react-router-dom@4.2.2 --save
+
+w App.js
+
+import { BrowserRouter } from 'react-router-dom';
+
+. . .
+
+    <BrowserRouter>
+      <div className="App">
+        <Main />
+      </div>
+    </BrowserRouter>
+
+utworzyc komponent o nazwie HomeComponent.js
+
+import React from 'react';
+
+function Home(props) {
+    return(
+      <div className="container">
+        <h4>Home</h4>
+      </div>
+    );
+}
+
+export default Home;   
+
+MainComponent:
+
+. . .
+
+import Home from './HomeComponent';
+
+. . .
+
+import { Switch, Route, Redirect } from 'react-router-dom';
+
+. . .
+
+  render() {
+
+
+    const HomePage = () => {
+      return(
+          <Home 
+          />
+      );
+    }
+
+. . .
+
+          <Switch>
+              <Route path='/home' component={HomePage} />
+              <Route exact path='/menu' component={() => <Menu dishes={this.state.dishes} />} />
+              <Redirect to="/home" />
+          </Switch>
+
+. . .
+
+
+HeaderComponent:
+
+import { Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavItem, Jumbotron } from 'reactstrap';
+import { NavLink } from 'react-router-dom';
+
+class Header extends Component {
+    constructor(props) {
+        super(props);
+    
+        this.toggleNav = this.toggleNav.bind(this);
+        this.state = {
+          isNavOpen: false
+        };
+      }
+
+      toggleNav() {
+        this.setState({
+          isNavOpen: !this.state.isNavOpen
+        });
+      }
+
+    render() {
+        return(
+            <div>
+                <Navbar dark expand="md">
+                    <div className="container">
+                        <NavbarToggler onClick={this.toggleNav} />
+                        <NavbarBrand className="mr-auto" href="/"><img src='assets/images/logo.png' height="30" width="41" alt='Ristorante Con Fusion' /></NavbarBrand>
+                        <Collapse isOpen={this.state.isNavOpen} navbar>
+                            <Nav navbar>
+                            <NavItem>
+                                <NavLink className="nav-link"  to='/home'><span className="fa fa-home fa-lg"></span> Home</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className="nav-link" to='/aboutus'><span className="fa fa-info fa-lg"></span> About Us</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className="nav-link"  to='/menu'><span className="fa fa-list fa-lg"></span> Menu</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className="nav-link" to='/contactus'><span className="fa fa-address-card fa-lg"></span> Contact Us</NavLink>
+                            </NavItem>
+                            </Nav>
+                        </Collapse>
+                    </div>
+                </Navbar>
+                <Jumbotron>
+                    <div className="container">
+                        <div className="row row-header">
+                            <div className="col-12 col-sm-6">
+                                <h1>Ristorante con Fusion</h1>
+                                <p>We take inspiration from the World's best cuisines, and create a unique fusion experience. Our lipsmacking creations will tickle your culinary senses!</p>
+                            </div>
+                        </div>
+                    </div>
+                </Jumbotron>
+            </div>
+        );
+    }
+}
+
+FooterComponent:
+
+. . .
+
+import { Link } from 'react-router-dom';
+
+. . .
+
+                        <li><Link to='/home'>Home</Link></li>
+                        <li><Link to='/aboutus'>About Us</Link></li>
+                        <li><Link to='/menu'>Menu</Link></li>
+                        <li><Link to='/contactus'>Contact Us</Link></li>
+                        
+. . .
