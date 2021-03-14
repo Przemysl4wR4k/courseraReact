@@ -388,3 +388,221 @@ okreslone funkcje
   W dużym skrócie componenty mozna podzielic na odpowiedzialne za dane i za wygląd aplikacji:
 
   tworzymy MainComponent.js skąd odciążymy App.js
+
+  import React, { Component } from 'react';
+import { Navbar, NavbarBrand } from 'reactstrap';
+import Menu from './MenuComponent';
+import DishDetail from './DishdetailComponent';
+import { DISHES } from '../shared/dishes';
+
+class Main extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+        dishes: DISHES,
+        selectedDish: null
+    };
+  }
+
+  onDishSelect(dishId) {
+    this.setState({ selectedDish: dishId});
+  }
+
+  render() {
+    return (
+      <div>
+        <Navbar dark color="primary">
+          <div className="container">
+            <NavbarBrand href="/">Ristorante Con Fusion</NavbarBrand>
+          </div>
+        </Navbar>   //w przypadku nacisniecia menu przekazana zostaje funkcja w celu ustalenia id klikniete elementu 
+        <Menu dishes={this.state.dishes} onClick={(dishId) => this.onDishSelect(dishId)} />
+        <DishDetail dish={this.state.dishes.filter((dish) => dish.id === this.state.selectedDish)[0]} />
+      </div>        // dishDetail dostaje jako propsy wszystkie dania ktore maja id zgodne z kliknietym elementem
+    );              // (jest tylko 1 takie danie)
+  }
+}
+
+export default Main;
+
+app zawiera tylko klase w celu ustalenia css i main
+
+import Main from './components/MainComponent';
+
+class App extends Component {
+
+  render() {
+    return (
+      <div className="App">
+        <Main />
+      </div>
+    );
+  }
+}
+
+w menu onclick wykorzystuje podana mu funkcje:
+
+<Card onClick={() => this.props.onClick(dish.id)}>
+ 
+
+Czas i jego parsowanie:
+
+{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}
+
+
+Cykl życia 2:
+
+przy kazdy kliknieciu w menu zupdatowany zostaje dishdetail:
+
+podczas re-renderowania mozna uzyc funkcji:
+
+getDerivedStateFromProps ()
+shouldComponentUpdate ()      //wylaczanie updatowania
+render ()
+getSnapshotBeforeUpdate ()    //przydatne przy skrolowaniu
+componentDidUpdate ()
+
+proste komponenty służące tylko do wyświetlania informacji mogą być zaimplementowane
+za pomocą functional components
+
+u nas mozna to zrobic z menu componentem i dishdetail componentem
+
+menu komponent i detaildish zostaja przerobione:
+
+import React from 'react';
+import { Card, CardImg, CardImgOverlay, CardBody, CardTitle, CardText } from 'reactstrap';
+
+    function RenderMenuItem({dish, onClick}){
+        return(
+            <Card onClick={() => onClick(dish.id)}>
+                <CardImg width="100%" src={dish.image} alt={dish.name} />
+                <CardImgOverlay>
+                    <CardTitle heading>{dish.name}</CardTitle>
+                </CardImgOverlay>
+            </Card>
+        );
+    }
+
+    const Menu = (props) => {
+        const menu = props.dishes.map((dish) => {
+            return (
+                <div key={dish.id} className="col-12 col-md-5 m-1">
+                    <RenderMenuItem dish={dish} onClick={props.onClick}/>
+                </div>
+            );
+        });
+
+        return (
+            <div className="container">
+                <div className="row">
+                        {menu}
+                </div>
+            </div>
+        );         
+    }
+
+export default Menu;
+
+React Virtual DOM
+
+sprawdza które czesci aplikacji (wierzchołki drzewa) zostały zmienione, i re-renderuje tylko
+je i czesci od nich zalezne (wierzchołki-dzieci). minimalizuje ilosc odswiezanych obiektow
+
+mozna wydzielic ktore elementy maja pozostac stale, bez koniecznosci re-renderowania
+
+Header & Footer:
+
+yarn add font-awesome@4.7.0   //ikony font awesome
+
+yarn add bootstrap-social@5.1.1   //guziki social mediow
+
+w index js dodac:
+
+import 'font-awesome/css/font-awesome.css';
+import 'bootstrap-social/bootstrap-social.css';
+
+Nalezy w folderze components utworzyc pliki HeaderComponent.js i 
+FooterComponent.js
+
+należy wyciąć implementacje navbar z MainComponent i wkleic do HeaderComponent
+
+import React, { Component } from 'react';
+import { Navbar, NavbarBrand, Jumbotron } from 'reactstrap';
+
+class Header extends Component {
+  render() {
+    return(
+    <React.Fragment>    //react fragment umozliwia spiecie wiekszej ilosci elementoww (?)
+      <Navbar dark>
+        <div className="container">
+            <NavbarBrand href="/">Ristorante Con Fusion</NavbarBrand>
+        </div>
+      </Navbar>
+      <Jumbotron>
+           <div className="container">
+               <div className="row row-header">
+                   <div className="col-12 col-sm-6">
+                       <h1>Ristorante con Fusion</h1>
+                       <p>We take inspiration from the World's best cuisines, and create a unique fusion experience. Our lipsmacking creations will tickle your culinary senses!</p>
+                   </div>
+               </div>
+           </div>
+       </Jumbotron>
+    </React.Fragment>
+    );
+  }
+}
+
+export default Header;
+
+import React from 'react';
+
+function Footer(props) {
+    return(
+    <div className="footer">
+        <div className="container">
+            <div className="row justify-content-center">             
+                <div className="col-4 offset-1 col-sm-2">
+                    <h5>Links</h5>
+                    <ul className="list-unstyled">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Menu</a></li>
+                        <li><a href="contactus.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div className="col-7 col-sm-5">
+                    <h5>Our Address</h5>
+                    <address>
+		              121, Clear Water Bay Road<br />
+		              Clear Water Bay, Kowloon<br />
+		              HONG KONG<br />
+		              <i className="fa fa-phone fa-lg"></i>: +852 1234 5678<br />
+		              <i className="fa fa-fax fa-lg"></i>: +852 8765 4321<br />
+		              <i className="fa fa-envelope fa-lg"></i>: <a href="mailto:confusion@food.net">
+                         confusion@food.net</a>
+                    </address>
+                </div>
+                <div className="col-12 col-sm-4 align-self-center">
+                    <div className="text-center">
+                        <a className="btn btn-social-icon btn-google" href="http://google.com/+"><i className="fa fa-google-plus"></i></a>
+                        <a className="btn btn-social-icon btn-facebook" href="http://www.facebook.com/profile.php?id="><i className="fa fa-facebook"></i></a>
+                        <a className="btn btn-social-icon btn-linkedin" href="http://www.linkedin.com/in/"><i className="fa fa-linkedin"></i></a>
+                        <a className="btn btn-social-icon btn-twitter" href="http://twitter.com/"><i className="fa fa-twitter"></i></a>
+                        <a className="btn btn-social-icon btn-google" href="http://youtube.com/"><i className="fa fa-youtube"></i></a>
+                        <a className="btn btn-social-icon" href="mailto:"><i className="fa fa-envelope-o"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div className="row justify-content-center">             
+                <div className="col-auto">
+                    <p>© Copyright 2018 Ristorante Con Fusion</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    )
+}
+
+export default Footer;
