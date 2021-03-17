@@ -752,3 +752,136 @@ import { Link } from 'react-router-dom';
                         <li><Link to='/contactus'>Contact Us</Link></li>
                         
 . . .
+
+Single Page Application
+
+stworz ContactComponent
+
+import React from 'react';
+
+function Contact(props) {
+    return(
+        <div className="container">
+            <div className="row row-content">
+                <div className="col-12">
+                <h3>Location Information</h3>
+                </div>
+                <div className="col-12 col-sm-4 offset-sm-1">
+                        <h5>Our Address</h5>
+                        <address>
+                        121, Clear Water Bay Road<br />
+                        Clear Water Bay, Kowloon<br />
+                        HONG KONG<br />
+                        <i className="fa fa-phone"></i>: +852 1234 5678<br />
+                        <i className="fa fa-fax"></i>: +852 8765 4321<br />
+                        <i className="fa fa-envelope"></i>: <a href="mailto:confusion@food.net">confusion@food.net</a>
+                        </address>
+                </div>
+                <div className="col-12 col-sm-6 offset-sm-1">
+                    <h5>Map of our Location</h5>
+                </div>
+                <div className="col-12 col-sm-11 offset-sm-1">
+                    <div className="btn-group" role="group">
+                        <a role="button" className="btn btn-primary" href="tel:+85212345678"><i className="fa fa-phone"></i> Call</a>
+                        <a role="button" className="btn btn-info"><i className="fa fa-skype"></i> Skype</a>
+                        <a role="button" className="btn btn-success" href="mailto:confusion@food.net"><i className="fa fa-envelope-o"></i> Email</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Contact;
+
+routowanie strony contactus w MainComponent.js
+. . .
+
+import Contact from './ContactComponent';
+
+. . .
+
+              <Route exact path='/contactus' component={Contact} />} />
+
+
+rozbicie dishes.js na dishes.js i comments.js a takze dodanie leaders.js i promotions.js
+
+nadanie formy HomeComponent.js
+
+import React from 'react';
+import { Card, CardImg, CardText, CardBody,
+    CardTitle, CardSubtitle} from 'reactstrap';
+
+function RenderCard({item}) {
+
+    return(
+        <Card>
+            <CardImg src={item.image} alt={item.name} />
+            <CardBody>
+            <CardTitle>{item.name}</CardTitle>
+            // tylko leaders.js ma atrybut designation
+            {item.designation ? <CardSubtitle>{item.designation}</CardSubtitle> : null }
+            <CardText>{item.description}</CardText>
+            </CardBody>
+        </Card>
+    );
+
+}
+
+function Home(props) {
+    return(
+        <div className="container">
+            <div className="row align-items-start">
+                <div className="col-12 col-md m-1">
+                    <RenderCard item={props.dish} />
+                </div>
+                <div className="col-12 col-md m-1">
+                    <RenderCard item={props.promotion} />
+                </div>
+                <div className="col-12 col-md m-1">
+                    <RenderCard item={props.leader} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Home;
+
+dodanie do stanu nowych jsów do MainComponent.js
+
+. . .
+
+import { COMMENTS } from '../shared/comments';
+import { PROMOTIONS } from '../shared/promotions';
+import { LEADERS } from '../shared/leaders';
+
+. . .
+
+class Main extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dishes: DISHES,
+      comments: COMMENTS,
+      promotions: PROMOTIONS,
+      leaders: LEADERS
+    };
+  }
+  
+  . . .
+
+    const HomePage = () => {
+      return(
+          <Home 
+              dish={this.state.dishes.filter((dish) => dish.featured)[0]}
+              promotion={this.state.promotions.filter((promotion) => promotion.featured)[0]}
+              // wyfiltruje te promocje/ tego lidera, dla ktorego featuredd === true
+              leader={this.state.leaders.filter((leader) => leader.featured === true)[0]}
+          />
+      );
+    }
+    
+. . .
