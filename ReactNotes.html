@@ -1052,4 +1052,143 @@ handleLogin(event) {
         <Button type="submit" value="submit" color="primary">Login</Button>
     </Form>
 </ModalBody>
-</Modal>        
+</Modal>
+
+Redux
+
+Redux Store:
+
+przechowuje state value
+tworzony za pomocą createStore()
+dispatch()
+getState()
+subscribe()
+
+connect()
+
+instalacja reduxa w projekcie
+
+yarn add redux@3.7.2
+yarn add react-redux@5.0.7
+
+tworzymy folder redux i plik reducer.js, wrzucamy do niego 
+state przechowywany dotychczas w  MainComponent 
+
+import { DISHES } from '../shared/dishes';
+import { COMMENTS } from '../shared/comments';
+import { PROMOTIONS } from '../shared/promotions';
+import { LEADERS } from '../shared/leaders';
+
+export const initialState = {
+    dishes: DISHES,
+    comments: COMMENTS,
+    promotions: PROMOTIONS,
+    leaders: LEADERS
+};
+
+// zmiana nastepuje przez akcje a initialState
+// bedzie potrzebny przy początkowym wywołaniu
+export const Reducer = (state = initialState, action) => {
+    return state;
+};
+
+
+utworzyc kolejny plik w ww. folderze, configureStore.js
+w nim zaimplementuje store do przechowywania stanu
+
+import {createStore} from 'redux';
+import { Reducer, initialState } from './reducer'
+
+export const ConfigureStore = () => {
+    const store = createStore(
+        Reducer, // reducer
+        initialState, // our initialState
+    );
+
+    return store;
+}
+
+w App.js należy podać store, a także otoczyć apke Providerem,
+umożliwia on przesyłanie stanów w głąb apki
+
+import { Provider } from 'react-redux';
+import { ConfigureStore } from './redux/configureStore';
+
+const store = ConfigureStore();
+
+
+. . .
+
+      <Provider store={store}>
+        <BrowserRouter>
+          <div className="App">
+            <Main />
+          </div>
+        </BrowserRouter>
+      </Provider>
+
+. . .
+
+umożliwienie MainComponent korzystanie z Reduxa
+
+. . .
+
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux';
+
+
+// po za klasą!!! 
+<!--  -->
+
+const mapStateToProps = state => {
+  return {
+    dishes: state.dishes,
+    comments: state.comments,
+    promotions: state.promotions,
+    leaders: state.leaders
+  }
+}
+
+. . .       // od teraz main importuje stan, zamiast uzywac wlasnego
+            // wiec nalezy zmienic odwolania na this.props...
+
+    const HomePage = () => {
+      return(
+          <Home 
+              dish={this.props.dishes.filter((dish) => dish.featured)[0]}
+              promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
+              leader={this.props.leaders.filter((leader) => leader.featured)[0]}
+          />
+      );
+    }
+
+    const DishWithId = ({match}) => {
+      return(
+          <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
+            comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))} />
+      );
+    };
+
+    return (
+      <div>
+        <Header />
+        <div>
+          <Switch>
+              <Route path='/home' component={HomePage} />
+              <Route exact path='/aboutus' component={() => <About leaders={this.props.leaders} />} />} />
+              <Route exact path='/menu' component={() => <Menu dishes={this.props.dishes} />} />
+              <Route path='/menu/:dishId' component={DishWithId} />
+              <Route exact path='/contactus' component={Contact} />} />
+              <Redirect to="/home" />
+          </Switch>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+}
+
+// withRouter umozliwia dalsze uzywanie routera, connect laczy z reduxem
+// mapStateToProps mowi co zrobic ze stanem 
+
+export default withRouter(connect(mapStateToProps)(Main));
