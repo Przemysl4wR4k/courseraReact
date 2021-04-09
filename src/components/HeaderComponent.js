@@ -1,7 +1,8 @@
 import React, { Component} from 'react';
 import { Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem, Jumbotron,
     Button, Modal, ModalHeader, ModalBody,
-    Form, FormGroup, Input, Label } from 'reactstrap';import { NavLink} from 'react-router-dom';
+    Form, FormGroup, Input, Label } from 'reactstrap';
+import { NavLink } from 'react-router-dom';
 class Header extends Component {
 
     constructor(props) {
@@ -102,7 +103,7 @@ class Header extends Component {
                                 <Input type="password" id="password" name="password"
                                     innerRef={(input) => this.password = input}  />
                             </FormGroup>
-                            <FormGroup check>
+                            <FormGroup check md={2}>
                                 <Label check>
                                     <Input type="checkbox" name="remember"
                                     innerRef={(input) => this.remember = input}  />
