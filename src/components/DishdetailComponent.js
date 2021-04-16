@@ -4,6 +4,7 @@ import {Card, CardBody, CardImg, CardText, CardImgOverlay,
     Modal, ModalHeader, ModalBody, Row, Label, Col} from 'reactstrap';
 import { Link } from 'react-router-dom'
 import { Control, LocalForm, Errors} from 'react-redux-form'
+import { addComment } from '../redux/ActionCreators';
 
     function RenderDish({dish}){
         return(
@@ -17,7 +18,7 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
         )
     }
 
-    function RenderComments({comments}){
+    function RenderComments({comments, addComment, dishId}){
 
         if(comments != null){
 
@@ -38,6 +39,7 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
                 <ul className="list-unstyled">
                     {commentsList}
                 </ul>
+                <CommentForm dishId={dishId} addComment={addComment}/>
             </div>
             )
         }
@@ -76,8 +78,10 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
                         </div>
                         <div className="col-12 col-md-5 m-1">
                             {console.log(props.comments)}
-                            <RenderComments comments={props.comments} />
-                            <CommentForm/>
+                            <RenderComments comments={props.comments} 
+                                addComment={props.addComment}
+                                dishId={props.dish.id}
+                            />
                         </div>
                     </div>
                 </div>
@@ -114,8 +118,11 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
         }
 
         handleSubmit(values){
+            this.toggleModalComment();
+            
             console.log("Current State is:" + JSON.stringify(values));
             alert("Current State is:" + JSON.stringify(values));
+            this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
         } 
 
         render(){
@@ -157,10 +164,10 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
                                         required: ' Required'
                                     }}
                                 />
-                                <Label htmlFor="name">
+                                <Label htmlFor="author">
                                     Your Name
                                 </Label>
-                                <Control.text model=".name" name="name" id="name"
+                                <Control.text model=".author" name="author" id="author"
                                     placeholder="Name" className="form-control"
                                     validators={{
                                         required,
@@ -170,7 +177,7 @@ import { Control, LocalForm, Errors} from 'react-redux-form'
                                 </Control.text>
                                 <Errors
                                     className="text-danger"
-                                    model=".name"
+                                    model=".author"
                                     show="touched"
                                     messages={{
                                         required: ' Required',

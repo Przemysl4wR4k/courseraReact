@@ -1393,3 +1393,147 @@ const validEmail = (val) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(val
                             </Row>
                             
 . . .
+
+Combining Reducers:
+
+w folderze redux dla kazdego typu danych tworzymy plik "nazwa.js"
+np. dishes.js, a w srodku implementujemy tak:
+
+import { DISHES } from '../shared/dishes';
+
+export const Dishes = ( state = DISHES, action) => {
+    switch(action.type) {
+        default:
+            return state;
+    }
+}
+
+analogicznie dla leaders, promotions, comments
+domyslnie zwracany jest zwykly state. Po zaimplementowaniu
+tego typu rozwiazania nieporzebny staje sie plik reducer.js
+nalezy go usunac
+natomiast w configureStore.js mergujemy te mniejsze reducery
+
+import { createStore , combineReducers } from 'redux';
+import { Dishes } from './dishes';
+import { Comments } from './comments';
+import { Promotions } from './promotions';
+import { Leaders } from './leaders';
+
+export const ConfigureStore = () => {
+    const store = createStore(
+        combineReducers({
+            dishes: Dishes,
+            comments: Comments,
+            promotions: Promotions,
+            leaders: Leaders
+        })
+    );
+
+    return store;
+}
+
+
+
+Redux Actions:
+
+
+w folderze redux tworzymy ActionTypes.js z zawartoscia
+
+export const ADD_COMMENT = 'ADD_COMMENT';
+
+co tworzy nam tag na typ akcji
+
+tworzy w nim rowniez ActionCreators.js
+
+import * as ActionTypes from './ActionTypes';
+
+export const addComment = (dishId, rating, author, comment) => ({
+    type: ActionTypes.ADD_COMMENT,
+    payload: {
+        dishId: dishId,
+        rating: rating,
+        author: author,
+        comment: comment
+    }
+});
+
+ktory posluzy do przeniesienia typu akcji i informacji
+
+aktualizujemy comments.js
+
+import { COMMENTS } from '../shared/comments';
+import * as ActionTypes from './ActionTypes';
+
+export const Comments = (state = COMMENTS, action) => {
+    switch (action.type) {
+        case ActionTypes.ADD_COMMENT:
+            var comment = action.payload;
+            comment.id = state.length;
+            comment.date = new Date().toISOString();
+            console.log("Comment: ", comment);
+            return state.concat(comment);
+
+        default:
+          return state;
+      }
+};
+
+concat umozliwia nam dodanie nowego komentarza do listy, rowniez tutaj trzeba utworzyc id i date komentarza
+trzeba umozliwic uzycie tego w MainComponent,
+uzycie dispatch do mapownaia wartosci i przekazaniu do dishdetail funkcji addComment
+
+
+. . .
+
+import { addComment } from '../redux/ActionCreators';
+
+. . .
+
+  const mapDispatchToProps = dispatch => ({
+  
+    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment))
+  
+  });
+
+. . .
+
+      <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
+        comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+        addComment={this.props.addComment}
+      />
+
+. . .
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));
+
+
+użycie tego w DishdetailComponent
+
+
+
+. . .
+
+  function RenderComments({comments, addComment, dishId}) {
+
+
+
+. . .
+
+      <CommentForm dishId={dishId} addComment={addComment} />
+
+
+. . .
+
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+
+
+
+. . .
+
+      <RenderComments comments={props.comments}
+        addComment={props.addComment}
+        dishId={props.dish.id}
+      />
+
+. . .
