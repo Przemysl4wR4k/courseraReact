@@ -1721,3 +1721,88 @@ import { Loading } from './LoadingComponent';
         else if (props.dish != null) 
         
 . . .
+
+Logger pozwala na wyswietlenie poprzednich stanow store w consoli
+
+react-redux-form pt 2 revisited
+
+umozliwienie formie dzialanie na reducerach i storze
+
+w folderze redux tworzymy plik forms.js
+
+export const InitialFeedback = {
+    firstname: '',
+    lastname: '',
+    telnum: '',
+    email: '',
+    agree: false,
+    contactType: 'Tel.',
+    message: ''
+};
+
+w configureStore.js:
+
+. . .
+
+import { createForms } from 'react-redux-form';
+
+. . .
+
+import { InitialFeedback } from './forms';
+
+. . .
+
+        combineReducers({
+            dishes: Dishes,
+            comments: Comments,
+            promotions: Promotions,
+            leaders: Leaders,
+            ...createForms({
+                feedback: InitialFeedback
+            })
+        }),
+        
+. . .
+
+w MainComponent.js:
+
+. . .
+
+import { actions } from 'react-redux-form';
+
+. . .
+
+  resetFeedbackForm: () => { dispatch(actions.reset('feedback'))} 
+        //resetuje wyglad formy i wprowadzone
+        //do niej dane
+. . .
+
+              <Route exact path='/contactus' component={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />} />
+              
+. . .
+
+w ContactComponent.js:
+
+. . .
+
+import { Control, Form, Errors, actions } from 'react-redux-form';
+
+. . .
+
+    handleSubmit(values) {
+        console.log('Current State is: ' + JSON.stringify(values));
+        alert('Current State is: ' + JSON.stringify(values));
+        this.props.resetFeedbackForm();
+        // event.preventDefault();
+    }
+
+. . .
+
+                        <Form model="feedback" onSubmit={(values) => this.handleSubmit(values)}>
+                          
+                          . . .
+                          
+
+                        </Form> // powrot z localform do form, konieczny model ="feedback"
+
+. . .
