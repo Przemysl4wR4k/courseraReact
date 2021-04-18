@@ -1806,3 +1806,241 @@ import { Control, Form, Errors, actions } from 'react-redux-form';
                         </Form> // powrot z localform do form, konieczny model ="feedback"
 
 . . .
+
+
+Server using json-server
+
+
+
+utworz nowy folder "json-server" w dowolnej lokacji na komputerze,
+w nim utworz folder public
+
+z wiersza polecen otwartego w tym folderze:
+
+npm install json-server -g
+
+zeby wlaczyc server:
+
+json-server --watch db.json -p 3001 -d 2000
+
+gdzie -p to numer portu, a -d to sztuczne opoznienie
+
+pobrane zostaly pliki z coursery, db.json wrzucony do json-server i
+folder z obrazkami images wrzucony do public
+
+Fetch from server:
+
+jesli przeglądarka nie obsługuje Fetcha to nalezy uzyc Cross-Fetch,
+Fetch jakkolwiek nie jest najlepsza technologią, bardziej popularne
+potrafia byc Axios czy Superagent
+
+instaluj:
+
+yarn add cross-fetch@2.1.0
+
+w folderze shared utworz baseUrl.js:
+
+export const baseUrl = 'http://localhost:3001/';
+
+nowe akcje w ActionTypes:
+
+export const ADD_COMMENTS = 'ADD_COMMENTS';
+export const COMMENTS_FAILED = 'COMMENTS_FAILED';
+export const PROMOS_LOADING = 'PROMOS_LOADING';
+export const ADD_PROMOS = 'ADD_PROMOS';
+export const PROMOS_FAILED = 'PROMOS_FAILED';
+
+
+ActionCreators:
+
+
+. . .
+
+import { baseUrl } from '../shared/baseUrl';
+
+. . .
+
+    return fetch(baseUrl + 'dishes')
+    .then(response => response.json())
+    .then(dishes => dispatch(addDishes(dishes)));
+    
+. . .
+
+
+export const fetchComments = () => (dispatch) => {    
+    return fetch(baseUrl + 'comments')
+    .then(response => response.json())
+    .then(comments => dispatch(addComments(comments)));
+};
+
+export const commentsFailed = (errmess) => ({
+    type: ActionTypes.COMMENTS_FAILED,
+    payload: errmess
+});
+
+export const addComments = (comments) => ({
+    type: ActionTypes.ADD_COMMENTS,
+    payload: comments
+});
+
+export const fetchPromos = () => (dispatch) => {
+    
+    dispatch(promosLoading());
+
+    return fetch(baseUrl + 'promotions')
+    .then(response => response.json())
+    .then(promos => dispatch(addPromos(promos)));
+}
+
+export const promosLoading = () => ({
+    type: ActionTypes.PROMOS_LOADING
+});
+
+export const promosFailed = (errmess) => ({
+    type: ActionTypes.PROMOS_FAILED,
+    payload: errmess
+});
+
+export const addPromos = (promos) => ({
+    type: ActionTypes.ADD_PROMOS,
+    payload: promos
+});
+
+comments.js:
+
+import * as ActionTypes from './ActionTypes';
+
+export const Comments = (state = { errMess: null, comments:[]}, action) => {
+  switch (action.type) {
+    case ActionTypes.ADD_COMMENTS:
+      return {...state, errMess: null, comments: action.payload};
+
+    case ActionTypes.COMMENTS_FAILED:
+      return {...state, errMess: action.payload};
+
+    case ActionTypes.ADD_COMMENT:
+        var comment = action.payload;
+        comment.id = state.comments.length;
+        comment.date = new Date().toISOString();
+        return { ...state, comments: state.comments.concat(comment)};
+
+    default:
+      return state;
+  }
+};
+
+promotions.js:
+
+import * as ActionTypes from './ActionTypes';
+
+export const Promotions = (state  = { isLoading: true,
+                                        errMess: null,
+                                        promotions:[]}, action) => {
+    switch (action.type) {
+        case ActionTypes.ADD_PROMOS:
+        return {...state, isLoading: false, errMess: null, promotions: action.payload};
+
+        case ActionTypes.PROMOS_LOADING:
+            return {...state, isLoading: true, errMess: null, promotions: []}
+
+        case ActionTypes.PROMOS_FAILED:
+            return {...state, isLoading: false, errMess: action.payload};
+
+        default:
+          return state;
+      }
+};
+
+MainComponent:
+
+. . .
+
+import { addComment, fetchDishes, fetchComments, fetchPromos } from '../redux/ActionCreators';
+
+. . .
+
+
+const mapDispatchToProps = dispatch => ({
+  addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
+  fetchDishes: () => { dispatch(fetchDishes())},
+  resetFeedbackForm: () => { dispatch(actions.reset('feedback'))},
+  fetchComments: () => dispatch(fetchComments()),
+  fetchPromos: () => dispatch(fetchPromos())
+});
+
+. . .
+
+  componentDidMount() {
+    this.props.fetchDishes();
+    this.props.fetchComments();
+    this.props.fetchPromos();
+  }
+  
+. . .
+
+          <Home 
+              dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
+              dishesLoading={this.props.dishes.isLoading}
+              dishErrMess={this.props.dishes.errMess}
+              promotion={this.props.promotions.promotions.filter((promo) => promo.featured)[0]}
+              promoLoading={this.props.promotions.isLoading}
+              promoErrMess={this.props.promotions.errMess}
+              leader={this.props.leaders.filter((leader) => leader.featured)[0]}
+          />
+          
+. . .
+
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
+            isLoading={this.props.dishes.isLoading}
+            errMess={this.props.dishes.errMess}
+            comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+            commentsErrMess={this.props.comments.errMess}
+            addComment={this.props.addComment}
+          />
+          
+. . .
+
+
+MenuComponent
+
+. . .
+
+import { baseUrl } from '../shared/baseUrl';
+
+. . .
+
+                    <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
+                    
+. . .
+
+
+HomeComponent
+
+
+. . .
+
+import { baseUrl } from '../shared/baseUrl';
+
+. . .
+
+                <CardImg src={baseUrl + item.image} alt={item.name} />
+                
+. . .
+
+                    <RenderCard item={props.promotion} isLoading={props.promoLoading} errMess={props.promoErrMess} />
+                    
+. . .
+
+
+DishdetailComponent:
+
+
+. . .
+
+import { baseUrl } from '../shared/baseUrl';
+
+. . .
+
+                <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+                
+. . .
