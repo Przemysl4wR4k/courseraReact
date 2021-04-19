@@ -2179,3 +2179,58 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 . . .
 
 wyrzucic date i id z comments.js, a w Main i DishDetail zmienic addComponent na postComponent
+
+React Animations:
+istnieje wiele bibliotek
+
+yarn add react-transition-group@2.3.0
+
+App.css
+
+. . .
+
+.page-enter {
+    opacity: 0.01;
+    transform: translateX(-100%);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateX(0%);
+    transition: all 300ms ease-in;
+}
+
+.page-exit {
+    opacity: 1;
+    transform: translateX(0%);
+}
+
+.page-exit-active {
+    opacity: 0.01;
+    transform: translateX(100%);
+    transition: all 300ms ease-out;
+}
+
+
+w MainComponent:
+
+. . .
+
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
+
+. . .
+
+          <TransitionGroup>
+            <CSSTransition key={this.props.location.key} classNames="page" timeout={300}>
+              <Switch location={this.props.location}>
+                  <Route path='/home' component={HomePage} />
+                  <Route exact path='/aboutus' component={() => <About leaders={this.props.leaders} />} />} />
+                  <Route exact path='/menu' component={() => <Menu dishes={this.props.dishes} />} />
+                  <Route path='/menu/:dishId' component={DishWithId} />
+                  <Route exact path='/contactus' component={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />} />
+                  <Redirect to="/home" />
+              </Switch>
+            </CSSTransition>
+          </TransitionGroup>
+          
+. . .
