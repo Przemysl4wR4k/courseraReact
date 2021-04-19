@@ -1851,7 +1851,9 @@ export const ADD_PROMOS = 'ADD_PROMOS';
 export const PROMOS_FAILED = 'PROMOS_FAILED';
 
 
-ActionCreators:
+ActionCreators:     // then przekazuje to co zwraca do nastepnego then,
+                    // tj ponizej response zwraca response.json,
+                    // i pod aliasem dishes dziala dalej
 
 
 . . .
@@ -2043,4 +2045,82 @@ import { baseUrl } from '../shared/baseUrl';
 
                 <CardImg top src={baseUrl + dish.image} alt={dish.name} />
                 
+. . .
+
+
+Fetch Handling Errors:
+
+
+. . .
+
+export const fetchDishes = () => (dispatch) => {
+
+    dispatch(dishesLoading(true));
+
+    return fetch(baseUrl + 'dishes')
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+      })
+    .then(response => response.json())
+    .then(dishes => dispatch(addDishes(dishes)))
+    .catch(error => dispatch(dishesFailed(error.message)));
+}
+
+. . .
+
+export const fetchComments = () => (dispatch) => {    
+    return fetch(baseUrl + 'comments')
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+      })
+    .then(response => response.json())
+    .then(comments => dispatch(addComments(comments)))
+    .catch(error => dispatch(commentsFailed(error.message)));
+};
+
+. . .
+
+export const fetchPromos = () => (dispatch) => {
+    
+    dispatch(promosLoading());
+
+    return fetch(baseUrl + 'promotions')
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+      })
+    .then(response => response.json())
+    .then(promos => dispatch(addPromos(promos)))
+    .catch(error => dispatch(promosFailed(error.message)));
+}
+
 . . .
