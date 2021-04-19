@@ -2124,3 +2124,58 @@ export const fetchPromos = () => (dispatch) => {
 }
 
 . . .
+
+
+Fetch Post Comment:
+
+cos jest zle ale nie wiem comments.js niby nie potrzebuje id bo jest dawane przez serwer,
+i zreszta jest, ale jesli wyrzuce te linijke to rzuca bledem losowym
+
+
+ActionCreators.js:
+
+. . .
+
+export const addComment = (comment) => ({
+    type: ActionTypes.ADD_COMMENT,
+    payload: comment
+});
+
+export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+
+    const newComment = {
+        dishId: dishId,
+        rating: rating,
+        author: author,
+        comment: comment
+    };
+    newComment.date = new Date().toISOString();
+    
+    return fetch(baseUrl + 'comments', {
+        method: "POST",
+        body: JSON.stringify(newComment),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            throw error;
+      })
+    .then(response => response.json())
+    .then(response => dispatch(addComment(response)))
+    .catch(error =>  { console.log('post comments', error.message); alert('Your comment could not be posted\nError: '+error.message); });
+};
+
+. . .
+
+wyrzucic date i id z comments.js, a w Main i DishDetail zmienic addComponent na postComponent
